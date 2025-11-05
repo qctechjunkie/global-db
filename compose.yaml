@@ -1,6 +1,6 @@
 networks:
   wp-network:
-    external: ${NETWORK_EXTERNAL}
+    external: true
 services:
   global-mariadb:
     image: mariadb:latest
