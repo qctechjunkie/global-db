@@ -1,9 +1,13 @@
 FROM mariadb:latest
 
-# Install required packages
+# Install required packages including mariadb-client
 RUN apt-get update && \
-    apt-get install -y cron gzip findutils && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y \
+    cron \
+    gzip \
+    findutils \
+    mariadb-client \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy backup scripts
 COPY backup.sh /usr/local/bin/backup.sh
