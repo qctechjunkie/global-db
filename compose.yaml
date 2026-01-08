@@ -44,6 +44,25 @@ services:
       - wp-network
     volumes:
       - phpmyadmin_data:/var/www/html/tmp
+  db-backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    container_name: ${BACKUP_CONTAINER_NAME}
+    restart: unless-stopped
+    depends_on:
+      - global-mariadb
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE}
+      RETENTION_DAYS: ${RETENTION_DAYS}
+    volumes:
+      - db_backups:/backups
+    networks:
+      - wp-network
 volumes:
   mariadb_data:
   phpmyadmin_data:
+  db_backups:

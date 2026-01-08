@@ -6,6 +6,7 @@
 # Docker volumes (if mounted locally)
 data/
 volumes/
+backups/
 
 # Logs
 *.log
