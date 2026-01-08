@@ -63,7 +63,7 @@ if [ -n "${SPECIFIC_DB}" ]; then
 
     # Restore single database
     echo "$(date): Restoring ${SPECIFIC_DB}..."
-    if gunzip < "${BACKUP_FILE}" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}"; then
+    if gunzip < "${BACKUP_FILE}" | mariadb -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}"; then
         echo "$(date): ✓ Database '${SPECIFIC_DB}' restored successfully"
     else
         echo "$(date): ✗ Database restore failed!" >&2
@@ -95,7 +95,7 @@ else
         DB_NAME=$(basename "${BACKUP_FILE}" .sql.gz)
         echo "$(date): Restoring ${DB_NAME}..."
 
-        if gunzip < "${BACKUP_FILE}" | mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}"; then
+        if gunzip < "${BACKUP_FILE}" | mariadb -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}"; then
             echo "$(date): ✓ ${DB_NAME} restored successfully"
             RESTORED_COUNT=$((RESTORED_COUNT + 1))
         else

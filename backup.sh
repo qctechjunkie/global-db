@@ -13,7 +13,7 @@ echo "$(date): Starting database backup session..."
 mkdir -p "${BACKUP_SESSION_DIR}"
 
 # Get list of all databases except system databases
-DATABASES=$(mysql -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema|mysql|sys)")
+DATABASES=$(mariadb -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema|mysql|sys)")
 
 if [ -z "$DATABASES" ]; then
     echo "$(date): No databases found to backup"
@@ -30,7 +30,7 @@ for DB in $DATABASES; do
     BACKUP_FILE="${BACKUP_SESSION_DIR}/${DB}.sql.gz"
     echo "$(date): Backing up database: ${DB}"
 
-    if mysqldump -h"${MYSQL_HOST}" \
+    if mariadb-dump -h"${MYSQL_HOST}" \
         -u"${MYSQL_USER}" \
         -p"${MYSQL_PASSWORD}" \
         --databases "${DB}" \
