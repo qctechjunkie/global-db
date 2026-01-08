@@ -1,0 +1,42 @@
+FROM mariadb:latest
+
+# Install required packages
+RUN apt-get update && \
+    apt-get install -y cron gzip findutils && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy backup scripts
+COPY backup.sh /usr/local/bin/backup.sh
+COPY restore.sh /usr/local/bin/restore.sh
+RUN chmod +x /usr/local/bin/backup.sh /usr/local/bin/restore.sh
+
+# Create backup directory
+RUN mkdir -p /backups
+
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+# Create cron job based on schedule\n\
+echo "${BACKUP_SCHEDULE} /usr/local/bin/backup.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/backup-cron\n\
+\n\
+# Give execution rights on the cron job\n\
+chmod 0644 /etc/cron.d/backup-cron\n\
+\n\
+# Apply cron job\n\
+crontab /etc/cron.d/backup-cron\n\
+\n\
+# Create the log file\n\
+touch /var/log/cron.log\n\
+\n\
+# Run initial backup\n\
+echo "Running initial backup..."\n\
+/usr/local/bin/backup.sh\n\
+\n\
+# Start cron in foreground\n\
+echo "Starting cron scheduler..."\n\
+cron && tail -f /var/log/cron.log' > /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

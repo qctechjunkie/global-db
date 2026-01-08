@@ -34,7 +34,6 @@ Desktop.ini
 
 # Backup files
 *.bak
-*.backup
 *.old
 *.tmp
 
