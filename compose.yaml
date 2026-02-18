@@ -48,16 +48,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backup
-    container_name: ${BACKUP_CONTAINER_NAME}
+    container_name: ${BACKUP_CONTAINER_NAME:-db-backup}
     restart: unless-stopped
     depends_on:
       - global-mariadb
     environment:
-      MYSQL_HOST: ${MYSQL_HOST}
-      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_HOST: ${MYSQL_HOST:-global-mariadb}
+      MYSQL_USER: ${MYSQL_USER:-root}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE}
-      RETENTION_DAYS: ${RETENTION_DAYS}
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE:-0 2 * * *}
+      RETENTION_DAYS: ${RETENTION_DAYS:-7}
     volumes:
       - db_backups:/backups
     networks:
