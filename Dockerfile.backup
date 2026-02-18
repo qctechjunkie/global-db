@@ -33,6 +33,14 @@ crontab /etc/cron.d/backup-cron\n\
 # Create the log file\n\
 touch /var/log/cron.log\n\
 \n\
+# Wait for MariaDB to be ready before running initial backup\n\
+echo "Waiting for MariaDB to be ready..."\n\
+until mariadb -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1" > /dev/null 2>&1; do\n\
+    echo "MariaDB not ready yet, retrying in 5s..."\n\
+    sleep 5\n\
+done\n\
+echo "MariaDB is ready."\n\
+\n\
 # Run initial backup\n\
 echo "Running initial backup..."\n\
 /usr/local/bin/backup.sh\n\

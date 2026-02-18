@@ -9,17 +9,16 @@ BACKUP_SESSION_DIR="${BACKUP_DIR}/${TIMESTAMP}"
 
 echo "$(date): Starting database backup session..."
 
-# Create backup session directory
-mkdir -p "${BACKUP_SESSION_DIR}"
-
 # Get list of all databases except system databases
 DATABASES=$(mariadb -h"${MYSQL_HOST}" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema|mysql|sys)")
 
 if [ -z "$DATABASES" ]; then
     echo "$(date): No databases found to backup"
-    rmdir "${BACKUP_SESSION_DIR}"
     exit 0
 fi
+
+# Create backup session directory only after confirming connectivity
+mkdir -p "${BACKUP_SESSION_DIR}"
 
 # Backup each database separately
 BACKUP_COUNT=0
