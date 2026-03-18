@@ -37,46 +37,6 @@ $ mariadb --version
 # Output: mariadb from 12.1.2-MariaDB, client 15.2
 ```
 
-## Our Implementation
-
-### backup.sh
-- Uses `mariadb` command to list databases
-- Uses `mariadb-dump` to create backups
-- Both commands accept the same flags as the old mysql/mysqldump
-
-### restore.sh
-- Uses `mariadb` command to restore from SQL dumps
-- Accepts piped input from gunzip
-
-## Flags Used and Their Sources
-
-All flags are documented in the official MariaDB Knowledge Base:
-
-### mariadb-dump flags
-**Source:** https://mariadb.com/kb/en/mariadb-dump/
-
-```bash
-mariadb-dump \
-  --databases "${DB}"        # Dump specific database with CREATE DATABASE
-  --single-transaction       # Consistent snapshot without locking (InnoDB)
-  --quick                    # Retrieve rows one at a time (memory efficient)
-  --lock-tables=false        # Don't lock tables (safe with single-transaction)
-  --routines                 # Include stored procedures/functions
-  --triggers                 # Include triggers
-  --events                   # Include scheduled events
-```
-
-### Connection parameters
-Both `mariadb` and `mariadb-dump` use these connection options:
-
-```bash
--h"${MYSQL_HOST}"          # Hostname/container name
--u"${MYSQL_USER}"          # Username
--p"${MYSQL_PASSWORD}"      # Password (no space after -p)
-```
-
-**Source:** https://mariadb.com/kb/en/connecting-to-mariadb/
-
 ## Why No Symlinks?
 
 While older MariaDB versions created symlinks from `mysql` → `mariadb`, the Docker image we built does NOT automatically create these symlinks. This is why explicitly using `mariadb` commands is required.
@@ -87,14 +47,11 @@ Verify commands work in the container:
 
 ```bash
 # Test client connection
-docker exec db-backup mariadb -h global-mariadb -uroot -p'PASSWORD' -e "SHOW DATABASES;"
-
-# Test dump utility
-docker exec db-backup mariadb-dump -h global-mariadb -uroot -p'PASSWORD' --databases test_db
+docker exec global-mariadb mariadb -uroot -p'PASSWORD' -e "SHOW DATABASES;"
 
 # Check command locations
-docker exec db-backup which mariadb        # /usr/bin/mariadb
-docker exec db-backup which mariadb-dump   # /usr/bin/mariadb-dump
+docker exec global-mariadb which mariadb        # /usr/bin/mariadb
+docker exec global-mariadb which mariadb-dump   # /usr/bin/mariadb-dump
 ```
 
 ## References
